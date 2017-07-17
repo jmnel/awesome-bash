@@ -1,0 +1,68 @@
+#/usr/bin/env bash
+
+CWD=''
+CMD='konsole'
+
+# Get window ID
+ID=$(xdpyinfo | grep focus | cut -f4 -d " ")
+
+# Get PID of process whose window this is
+PID=$(xprop -id $ID | grep -m 1 PID | cut -d " " -f 3)
+
+# Get last child process (shell, vim, etc)
+if [ -n "$PID" ]; then
+    tree=$(pstree -lpA $PID | awk '/zsh/ { print }')
+    echo "${tree}" > /home/jacques/testoutput
+    n=$(echo ${tree} | awk -F'-[-+]-' '/zsh/ { print NF }' )
+    n=$(($n))
+    zshPID='';
+    nvimPID='';
+
+    tokens=($(echo "$tree" | awk -F'-[-+]-' '/zsh/ {
+        for(i = 1; i <= NF; i++) {
+            print $i
+        }
+    }'))
+    progs=''
+    for i in `seq 0 $n`; do
+        progs[${i}]=$(echo "${tokens[i]}" | sed '/([0-9]*)/s/([0-9]*)//g')
+    done
+    zshFound=false
+    zshIndex=-1
+    nvimFound=false
+    nvimIndex=-1
+    echo
+    for i in `seq 0 $n`; do
+        prog="${progs[$i]}"
+        echo "${prog}" >> testoutput
+        if [ "$prog" == "zsh" ]; then
+            zshFound=true
+            zshIndex=$i
+
+        fi
+        if [ "${prog}" == "nvim" ]; then
+            nvimFound=true
+            nvimIndex=$i
+        fi
+    done
+
+    pid=-1
+    if $nvimFound; then
+        pid=$(echo ${tokens[$nvimIndex]} | sed '/nvim/s/nvim(//' | sed '/)/s/)//')
+    elif $zshFound; then
+        pid=$(echo ${tokens[$zshIndex]} | sed '/zsh/s/zsh(//' | sed '/)/s/)//')
+    fi
+
+    cwd=''
+    if [ $pid -gt -1 ]; then
+        if [ -e "/proc/$pid/cwd" ]; then
+            cwd=$(readlink /proc/$pid/cwd)
+        fi
+    fi
+
+    if [ -n "$cwd" ]; then
+        konsole --workdir "${cwd}"
+    else
+        konsole
+    fi
+fi
