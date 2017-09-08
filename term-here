@@ -12,7 +12,7 @@ PID=$(xprop -id $ID | grep -m 1 PID | cut -d " " -f 3)
 # Get last child process (shell, vim, etc)
 if [ -n "$PID" ]; then
     tree=$(pstree -lpA $PID | awk '/zsh/ { print }')
-    echo "${tree}" > /home/jacques/testoutput
+    #echo "${tree}" > /home/jacques/testoutput
     n=$(echo ${tree} | awk -F'-[-+]-' '/zsh/ { print NF }' )
     n=$(($n))
     zshPID='';
@@ -34,7 +34,7 @@ if [ -n "$PID" ]; then
     echo
     for i in `seq 0 $n`; do
         prog="${progs[$i]}"
-        echo "${prog}" >> testoutput
+        #echo "${prog}" >> testoutput
         if [ "$prog" == "zsh" ]; then
             zshFound=true
             zshIndex=$i
