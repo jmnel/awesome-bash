@@ -31,7 +31,7 @@ if [ -n "$PID" ]; then
     zshIndex=-1
     nvimFound=false
     nvimIndex=-1
-    echo
+    #echo
     for i in `seq 0 $n`; do
         prog="${progs[$i]}"
         #echo "${prog}" >> testoutput
