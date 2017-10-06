@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 CWD=''
-CMD='konsole'
+CMD='alacritty'
 
 # Get window ID
 ID=$(xdpyinfo | grep focus | cut -f4 -d " ")
@@ -61,8 +61,10 @@ if [ -n "$PID" ]; then
     fi
 
     if [ -n "$cwd" ]; then
-        konsole --workdir "${cwd}"
+        #konsole --workdir "${cwd}"
+        alacritty --working-directory "${cwd}"
     else
-        konsole
+        #konsole
+        alacritty
     fi
 fi
