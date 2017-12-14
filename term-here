@@ -31,6 +31,8 @@ if [ -n "$PID" ]; then
     zshIndex=-1
     nvimFound=false
     nvimIndex=-1
+    sublimeFound=false
+    sublimeIndex=-1
     #echo
     for i in `seq 0 $n`; do
         prog="${progs[$i]}"
@@ -44,11 +46,18 @@ if [ -n "$PID" ]; then
             nvimFound=true
             nvimIndex=$i
         fi
+        if [ "${prog}" == "sublime_text" ]; then
+            sublimeFound=true
+            sublimeIndex=true
+        fi
     done
 
+    
     pid=-1
     if $nvimFound; then
         pid=$(echo ${tokens[$nvimIndex]} | sed '/nvim/s/nvim(//' | sed '/)/s/)//')
+    elif $sublimeFound; then
+        pid=$(echo ${tokens[$sublimeIndex]} | sed '/sublime_text/s/sublime_text(//' | sed '/)/s/)//')
     elif $zshFound; then
         pid=$(echo ${tokens[$zshIndex]} | sed '/zsh/s/zsh(//' | sed '/)/s/)//')
     fi
